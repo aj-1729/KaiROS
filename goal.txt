@@ -1,0 +1,14 @@
+tring to extract features from song using librosa:
+features being extracted:
+1. chroma_stft
+2.mfcc
+3.spectral_contrast
+4.beat.tempo
+
+Based on these, we calculate the valence and arousal of the song.
+
+Trained the model using data from DEAM. Valence and Arousal are provided for all songs in DEAM annotations folder.
+Using 80:20 split on dataset for training:testing
+
+Currently model is regression based (RandomForrestRegressor), somehow have to develop it to classify into 2,3 emotions
+like happy, sad, angry, etc. based on the arousal and valence values.
