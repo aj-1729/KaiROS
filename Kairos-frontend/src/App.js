@@ -283,89 +283,83 @@ const ResultsPage = ({ result, onStartOver }) => {
 };
 
 
-// Main App Logic 
+// Main App Logic - CORRECTED
 function App() {
     const [page, setPage] = useState('home');
     const [analysisResult, setAnalysisResult] = useState(null);
     const [error, setError] = useState(null);
 
-    // Dummy refs for sounds since we don't have the files
-    const HometoLang = useRef({ play: () => {}, currentTime: 0 });
-    const LandgtoProcesng = useRef({ play: () => {}, currentTime: 0 });
-    const ProcesngtoResults = useRef({ play: () => {}, currentTime: 0 });
+    const HometoLang = useRef(null);
+    const LandgtoProcesng = useRef(null);
+    const ProcesngtoResults = useRef(null);
 
-    const transnHometoLandg = () => {
-        if (HometoLang.current) {
-            HometoLang.current.currentTime = 0;
-            HometoLang.current.play();
+    // --- FIX 1: Make sound functions async ---
+    const playSound = async (audioRef) => {
+        if (audioRef.current) {
+            try {
+                audioRef.current.currentTime = 0;
+                await audioRef.current.play(); // Wait for play to finish
+            } catch (err) {
+                console.error("Audio play was interrupted or failed:", err);
+            }
         }
     };
 
-    const transnLandgtoProcesng = () => {
-        if (LandgtoProcesng.current) {
-            LandgtoProcesng.current.currentTime = 0;
-            LandgtoProcesng.current.play();
-        }
-    };
-
-    const transnProcesngtoResults = () => {
-        if (ProcesngtoResults.current) {
-            ProcesngtoResults.current.currentTime = 0;
-            ProcesngtoResults.current.play();
-        }
-    };
-
-    const handleGetStarted = () => {
-        transnHometoLandg();
+    // --- FIX 2: Make handler functions async ---
+    const handleGetStarted = async () => {
+        await playSound(HometoLang);
         setPage('landing');
     };
 
-    const handleStartOver = () => {
-        transnHometoLandg();
+    const handleStartOver = async () => {
+        await playSound(HometoLang);
         setAnalysisResult(null);
         setError(null);
         setPage('landing');
     };
 
-    const handleUpload = async (file) => {
-        transnLandgtoProcesng();
-        setPage('processing');
-        setError(null);
+    // In App.js
 
-        const formData = new FormData();
-        formData.append('file', file);
+const handleUpload = async (file) => {
+    await playSound(LandgtoProcesng); // Play sound and wait
+    setPage('processing');
+    setError(null);
 
-        try {
-            const response = await fetch('http://127.0.0.1:5000/recommend', {
-                method: 'POST',
-                body: formData
-            });
+    const formData = new FormData();
+    formData.append('file', file);
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: 'An unknown error occurred.' }));
-                throw new Error(errorData.error || 'Could not get recommendations.');
-            }
+    try {
+        const response = await fetch('http://127.0.0.1:5000/recommend', {
+            method: 'POST',
+            body: formData
+        });
 
-            const data = await response.json();
-
-            const combinedResult = {
-                emotion: data.seed_song_analysis.emotion,
-                recommendations: data.recommendations
-            };
-            
-            
-            setTimeout(() => {
-                transnProcesngtoResults();
-                setAnalysisResult(combinedResult);
-                setPage('results');
-            }, 2500);
-
-        } catch (err) {
-            console.error("API call failed:", err);
-            setError(err.message || 'Failed to fetch. Please check your connection.');
-            setPage('processing');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Could not get recommendations.');
         }
-    };
+
+        const data = await response.json();
+        const combinedResult = {
+            emotion: data.seed_song_analysis.emotion,
+            recommendations: data.recommendations
+        };
+        
+        // --- NEW: Add a minimum delay to show the animation ---
+        const minDisplayTime = 2000; // 2000 milliseconds = 2 seconds
+        await new Promise(resolve => setTimeout(resolve, minDisplayTime));
+
+        // Wait for the results sound before showing the page
+        await playSound(ProcesngtoResults); 
+        setAnalysisResult(combinedResult);
+        setPage('results');
+
+    } catch (err) {
+        console.error("API call failed:", err);
+        setError(err.message || 'Failed to fetch. Please check your connection.');
+        setPage('processing');
+    }
+};
 
     const renderPage = () => {
         switch (page) {
@@ -379,10 +373,10 @@ function App() {
 
     return (
         <>
-            
-                <audio ref={HometoLang} src={softSound} preload="auto" />
-                <audio ref={LandgtoProcesng} src={uploadSound} preload="auto" />
-                <audio ref={ProcesngtoResults} src={resultsSound} preload="auto" />
+            {/* Note: I've also updated your audio refs to be correct */}
+            <audio ref={HometoLang} src={softSound} preload="auto" />
+            <audio ref={LandgtoProcesng} src={uploadSound} preload="auto" />
+            <audio ref={ProcesngtoResults} src={resultsSound} preload="auto" />
             
             <AnimatePresence mode="wait">
                 {renderPage()}
