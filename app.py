@@ -23,13 +23,15 @@ except FileNotFoundError:
     print("Error: Model file 'deam_valence_arousal_rf.joblib' not found.")
 
 # --- DATABASE MODEL ---
+# In app.py, find and replace your old class with this one
+
 class AnalyzedSong(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     song_name = db.Column(db.String(200), nullable=False)
+    file_path = db.Column(db.String(300), nullable=False)
     predicted_emotion = db.Column(db.String(50), nullable=False)
-    valence = db.Column(db.Float, nullable=False)  
-    arousal = db.Column(db.Float, nullable=False) 
-
+    valence = db.Column(db.Float, nullable=False)
+    arousal = db.Column(db.Float, nullable=False)
 
 def extract_features(file_path, duration=30, sample_rate=22050):
     """Extract features from one audio file."""
