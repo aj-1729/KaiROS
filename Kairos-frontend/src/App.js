@@ -21,7 +21,7 @@ const animations = {
 const pageTransition = {
   type: "tween",
   ease: "easeInOut",
-  duration: 1.0 
+  duration: 1.0
 };
 
 
@@ -111,7 +111,7 @@ const HomePage = ({ onGetStarted }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     return (
         <motion.div initial="initial" animate="in" exit="out" variants={animations} transition={pageTransition}>
-            <div className="min-h-screen bg-cover bg-bottom flex flex-col font-sans relative overflow-hidden" style={{ backgroundImage: `url(${pageBackground})` }}>
+            <div className="min-h-screen bg-cover bg-bottom flex flex-col font-sans relative overflow-hidden" style={{ backgroundImage: `url(https://placehold.co/1920x1080/FADCD9/333333?text=Background)` }}>
                 <header className="absolute top-0 left-0 right-0 p-6 md:p-8 z-20">
                   <nav className="container mx-auto flex justify-between items-center">
                     <div className="flex items-center gap-3"><div className="bg-[#FFC5C2] p-2 rounded-lg"><MusicIcon className="text-gray-900" /></div><span className="text-2xl font-bold tracking-wide text-gray-900">KaiROS</span></div>
@@ -126,9 +126,9 @@ const HomePage = ({ onGetStarted }) => {
                         <h1 className="text-4xl md:text-5xl font-extrabold leading-tight text-gray-800">An audio recognition based <br /> Scalable AI.</h1>
                         <p className="mt-4 text-md md:text-lg text-gray-700 max-w-lg">Our technology processes your audio files and recommends songs based on your preferences.</p>
                     </div>
-                    <button 
-                        onClick={onGetStarted} 
-                        className="mt-8 px-12 py-4 font-oswald tracking-wider text-xl rounded-full shadow-lg transition-all transform hover:scale-105 text-gray-800" 
+                    <button
+                        onClick={onGetStarted}
+                        className="mt-8 px-12 py-4 font-oswald tracking-wider text-xl rounded-full shadow-lg transition-all transform hover:scale-105 text-gray-800"
                         style={{ backgroundColor: '#FFC5C2' }}
                     >
                         Get started
@@ -220,10 +220,17 @@ const ProcessingPage = ({ error, onStartOver }) => (
     </motion.div>
 );
 
-// Results Page
+// Results Page - UPDATED
 const ResultsPage = ({ result, onStartOver }) => {
-    if (!result) { return <div className="min-h-screen flex items-center justify-center"><p>Loading results...</p></div>; }
-    
+    // Defensive check for result data
+    if (!result || !result.emotion || !result.recommendations) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-800 text-white">
+                <p>Loading results or data is incomplete...</p>
+            </div>
+        );
+    }
+
     return (
         <motion.div initial="initial" animate="in" exit="out" variants={animations} transition={pageTransition}>
             <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#E5CBA2' }}>
@@ -233,11 +240,11 @@ const ResultsPage = ({ result, onStartOver }) => {
                         <main className="flex-grow flex flex-col lg:flex-row items-center justify-center text-center lg:text-left p-4 gap-12 py-20 sm:py-24 lg:py-32">
                             <div className="w-full lg:w-2/5 flex flex-col items-center lg:items-start space-y-8">
                                 <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-                                    The song seems to be: 
+                                    The song seems to be:
                                     <span className="capitalize block text-yellow-300 text-6xl md:text-7xl mt-2">{result.emotion}</span>
                                 </h1>
-                                <button 
-                                    onClick={onStartOver} 
+                                <button
+                                    onClick={onStartOver}
                                     className="bg-white/90 text-gray-800 text-xl font-bold px-10 py-4 rounded-full shadow-lg hover:scale-105 transition-transform"
                                 >
                                     Try Another Song
@@ -248,10 +255,13 @@ const ResultsPage = ({ result, onStartOver }) => {
                                 <h2 className="text-3xl font-bold mb-6 text-center">Recommended Songs</h2>
                                 <div className="bg-black/20 p-6 rounded-2xl max-h-[28rem] overflow-y-auto">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        {result.similar_songs.map((song, index) => (
+                                        {result.recommendations.map((song, index) => (
                                             <div key={index} className="bg-white/10 p-4 rounded-lg flex items-center gap-3 hover:bg-white/20 transition-colors">
                                                 <span className="text-xl font-bold text-white/50">{index + 1}.</span>
-                                                <span className="text-lg truncate">{song}</span>
+                                                <div className="flex flex-col text-left">
+                                                    <span className="text-lg truncate font-semibold">{song.song_name}</span>
+                                                    <span className="text-sm text-white/70">{song.predicted_emotion}</span>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
@@ -267,14 +277,16 @@ const ResultsPage = ({ result, onStartOver }) => {
 };
 
 
-// Logic
+// Main App Logic - UPDATED
 function App() {
-    const [page, setPage] = useState('home'); 
+    const [page, setPage] = useState('home');
     const [analysisResult, setAnalysisResult] = useState(null);
     const [error, setError] = useState(null);
-    const HometoLang = useRef(null);
-    const LandgtoProcesng = useRef(null);
-    const ProcesngtoResults = useRef(null);
+
+    // Dummy refs for sounds since we don't have the files
+    const HometoLang = useRef({ play: () => {}, currentTime: 0 });
+    const LandgtoProcesng = useRef({ play: () => {}, currentTime: 0 });
+    const ProcesngtoResults = useRef({ play: () => {}, currentTime: 0 });
 
     const transnHometoLandg = () => {
         if (HometoLang.current) {
@@ -282,7 +294,7 @@ function App() {
             HometoLang.current.play();
         }
     };
-    
+
     const transnLandgtoProcesng = () => {
         if (LandgtoProcesng.current) {
             LandgtoProcesng.current.currentTime = 0;
@@ -297,11 +309,11 @@ function App() {
         }
     };
 
-    const handleGetStarted = () => { 
+    const handleGetStarted = () => {
         transnHometoLandg();
-        setPage('landing'); 
+        setPage('landing');
     };
-    
+
     const handleStartOver = () => {
         transnHometoLandg();
         setAnalysisResult(null);
@@ -309,26 +321,49 @@ function App() {
         setPage('landing');
     };
 
-    //Data fetching
+    // Data fetching - UPDATED
     const handleUpload = async (file) => {
-        transnLandgtoProcesng(); 
+        transnLandgtoProcesng();
         setPage('processing');
         setError(null);
+
+        // --- Create FormData for the file ---
+        // The backend expects the key to be "file"
         const formData = new FormData();
-        formData.append('audio_file', file);
+        formData.append('file', file);
+
         try {
-            const response = await fetch('http://127.0.0.1:5000/analyze', { method: 'POST', body: formData });
-            if (!response.ok) { throw new Error('Could not get a response from the server.'); }
-            const data = await response.json();
+            // --- Make two separate API calls ---
+            // 1. Analyze the song to get the emotion
+            const analyzeResponse = await fetch('http://127.0.0.1:5000/analyze', { method: 'POST', body: formData });
+            if (!analyzeResponse.ok) { throw new Error('Could not analyze the song.'); }
+            const analyzeData = await analyzeResponse.json();
+
+            // 2. Get recommendations based on the same song
+            // We need to create a new FormData object because the body can only be consumed once.
+            const recommendFormData = new FormData();
+            recommendFormData.append('file', file);
+            const recommendResponse = await fetch('http://127.0.0.1:5000/recommend', { method: 'POST', body: recommendFormData });
+            if (!recommendResponse.ok) { throw new Error('Could not get recommendations.'); }
+            const recommendData = await recommendResponse.json();
+
+            // --- Combine the results into a single object for the ResultsPage ---
+            const combinedResult = {
+                emotion: analyzeData.predicted_emotion, // from /analyze
+                recommendations: recommendData.recommendations // from /recommend
+            };
+
             transnProcesngtoResults();
-            setAnalysisResult(data);
+            setAnalysisResult(combinedResult); // Set the new combined data
             setPage('results');
+
         } catch (err) {
             console.error("API call failed:", err);
             setError(err.message || 'Failed to fetch. Please check your connection.');
+            setPage('processing'); // Stay on processing page to show error
         }
     };
-    
+
     const renderPage = () => {
         switch (page) {
             case 'landing': return <LandingPage key="landing" onUpload={handleUpload} />;
@@ -341,9 +376,11 @@ function App() {
 
     return (
         <>
-            <audio ref={HometoLang} src={softSound} preload="auto" />
-            <audio ref={LandgtoProcesng} src={uploadSound} preload="auto" />
-            <audio ref={ProcesngtoResults} src={resultsSound} preload="auto" />
+            {
+                <audio ref={HometoLang} src={softSound} preload="auto" />
+                <audio ref={LandgtoProcesng} src={uploadSound} preload="auto" />
+                <audio ref={ProcesngtoResults} src={resultsSound} preload="auto" />
+            }
             <AnimatePresence mode="wait">
                 {renderPage()}
             </AnimatePresence>
