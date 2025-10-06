@@ -27,8 +27,10 @@ class AnalyzedSong(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     song_name = db.Column(db.String(200), nullable=False)
     predicted_emotion = db.Column(db.String(50), nullable=False)
+    valence = db.Column(db.Float, nullable=False)  
+    arousal = db.Column(db.Float, nullable=False) 
 
-# --- NEW: FEATURE EXTRACTION (COPIED FROM NOTEBOOK) ---
+
 def extract_features(file_path, duration=30, sample_rate=22050):
     """Extract features from one audio file."""
     try:
@@ -79,6 +81,8 @@ def map_emotion(valence, arousal):
 @app.route("/", methods=["GET"])  
 def check():
     return jsonify({"msg" : "api is running"})   
+
+
 @app.route("/analyze", methods=["POST"])
 def analyze():
     if model is None:
@@ -115,4 +119,53 @@ def analyze():
         "valence": float(valence),
         "arousal": float(arousal),
         "database_id": new_song_analysis.id
+    })
+
+
+@app.route("/recommend", methods=["POST"])
+def recommend():
+    if model is None:
+        return jsonify({"error": "Model is not loaded."}), 500
+    if "file" not in request.files:
+        return jsonify({"error": "No file uploaded."}), 400
+
+    
+    seed_file = request.files["file"]
+    seed_features = extract_features(seed_file)
+    if seed_features is None:
+        return jsonify({"error": "Could not process uploaded audio file."}), 400
+
+    seed_features_reshaped = seed_features.reshape(1, -1)
+    seed_valence_arousal = model.predict(seed_features_reshaped)
+    target_valence = float(seed_valence_arousal[0][0])
+    target_arousal = float(seed_valence_arousal[0][1])
+
+   
+    all_songs = AnalyzedSong.query.all()
+    
+    distances = []
+    for song in all_songs:
+        dist = np.sqrt((song.valence - target_valence)**2 + (song.arousal - target_arousal)**2)
+        distances.append((dist, song))
+    
+    distances.sort(key=lambda x: x[0])
+    
+   
+    recommendations = []
+    for dist, song in distances:
+        # Get the top 5 closest songs, making sure not to recommend the same song
+        if len(recommendations) < 5 and song.song_name != seed_file.filename:
+            recommendations.append({
+                "song_name": song.song_name,
+                "predicted_emotion": song.predicted_emotion,
+            })
+
+    return jsonify({
+        "seed_song_analysis": {
+            "name": seed_file.filename,
+            "emotion": map_emotion(target_valence, target_arousal),
+            "valence": target_valence,
+            "arousal": target_arousal
+        },
+        "recommendations": recommendations
     })
