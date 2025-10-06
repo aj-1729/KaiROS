@@ -111,7 +111,7 @@ const HomePage = ({ onGetStarted }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     return (
         <motion.div initial="initial" animate="in" exit="out" variants={animations} transition={pageTransition}>
-            <div className="min-h-screen bg-cover bg-bottom flex flex-col font-sans relative overflow-hidden" style={{ backgroundImage: `url(https://placehold.co/1920x1080/FADCD9/333333?text=Background)` }}>
+            <div className="min-h-screen bg-cover bg-bottom flex flex-col font-sans relative overflow-hidden" style={{ backgroundImage:`url(${pageBackground})` }}>
                 <header className="absolute top-0 left-0 right-0 p-6 md:p-8 z-20">
                   <nav className="container mx-auto flex justify-between items-center">
                     <div className="flex items-center gap-3"><div className="bg-[#FFC5C2] p-2 rounded-lg"><MusicIcon className="text-gray-900" /></div><span className="text-2xl font-bold tracking-wide text-gray-900">KaiROS</span></div>
@@ -322,47 +322,47 @@ function App() {
     };
 
     // Data fetching - UPDATED
-    const handleUpload = async (file) => {
-        transnLandgtoProcesng();
-        setPage('processing');
-        setError(null);
+    // In App.js, replace your existing handleUpload function with this one
 
-        // --- Create FormData for the file ---
-        // The backend expects the key to be "file"
-        const formData = new FormData();
-        formData.append('file', file);
+const handleUpload = async (file) => {
+    transnLandgtoProcesng();
+    setPage('processing');
+    setError(null);
 
-        try {
-            // --- Make two separate API calls ---
-            // 1. Analyze the song to get the emotion
-            const analyzeResponse = await fetch('http://127.0.0.1:5000/analyze', { method: 'POST', body: formData });
-            if (!analyzeResponse.ok) { throw new Error('Could not analyze the song.'); }
-            const analyzeData = await analyzeResponse.json();
+    const formData = new FormData();
+    formData.append('file', file);
 
-            // 2. Get recommendations based on the same song
-            // We need to create a new FormData object because the body can only be consumed once.
-            const recommendFormData = new FormData();
-            recommendFormData.append('file', file);
-            const recommendResponse = await fetch('http://127.0.0.1:5000/recommend', { method: 'POST', body: recommendFormData });
-            if (!recommendResponse.ok) { throw new Error('Could not get recommendations.'); }
-            const recommendData = await recommendResponse.json();
+    try {
+        // --- Make only ONE API call to the correct /recommend endpoint ---
+        const response = await fetch('http://127.0.0.1:5000/recommend', {
+            method: 'POST',
+            body: formData
+        });
 
-            // --- Combine the results into a single object for the ResultsPage ---
-            const combinedResult = {
-                emotion: analyzeData.predicted_emotion, // from /analyze
-                recommendations: recommendData.recommendations // from /recommend
-            };
-
-            transnProcesngtoResults();
-            setAnalysisResult(combinedResult); // Set the new combined data
-            setPage('results');
-
-        } catch (err) {
-            console.error("API call failed:", err);
-            setError(err.message || 'Failed to fetch. Please check your connection.');
-            setPage('processing'); // Stay on processing page to show error
+        if (!response.ok) {
+            // Get more detailed error from backend if available
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Could not get recommendations.');
         }
-    };
+
+        const data = await response.json();
+
+        // --- Build the result object from the single, correct response ---
+        const combinedResult = {
+            emotion: data.seed_song_analysis.emotion,
+            recommendations: data.recommendations
+        };
+
+        transnProcesngtoResults();
+        setAnalysisResult(combinedResult);
+        setPage('results');
+
+    } catch (err) {
+        console.error("API call failed:", err);
+        setError(err.message || 'Failed to fetch. Please check your connection.');
+        setPage('processing');
+    }
+};
 
     const renderPage = () => {
         switch (page) {
@@ -375,17 +375,17 @@ function App() {
     };
 
     return (
-        <>
-            {
-                <audio ref={HometoLang} src={softSound} preload="auto" />
-                <audio ref={LandgtoProcesng} src={uploadSound} preload="auto" />
-                <audio ref={ProcesngtoResults} src={resultsSound} preload="auto" />
-            }
-            <AnimatePresence mode="wait">
-                {renderPage()}
-            </AnimatePresence>
-        </>
-    );
+    <>
+        {/* --- FIX: Removed the unnecessary curly braces --- */}
+        <audio ref={HometoLang} src={softSound} preload="auto" />
+        <audio ref={LandgtoProcesng} src={uploadSound} preload="auto" />
+        <audio ref={ProcesngtoResults} src={resultsSound} preload="auto" />
+        
+        <AnimatePresence mode="wait">
+            {renderPage()}
+        </AnimatePresence>
+    </>
+);
 }
 
 export default App;

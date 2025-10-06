@@ -4,6 +4,8 @@ import os
 import librosa
 import numpy as np
 import joblib
+from flask_cors import CORS
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -12,7 +14,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'da
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
-
+CORS(app)
 # --- LOAD THE ML MODEL ON STARTUP ---
 # NOTE: The filename is now 'deam_valence_arousal_rf.joblib'
 try:
@@ -85,43 +87,43 @@ def check():
     return jsonify({"msg" : "api is running"})   
 
 
-@app.route("/analyze", methods=["POST"])
-def analyze():
-    if model is None:
-        return jsonify({"error": "Model is not loaded."}), 500
+# @app.route("/analyze", methods=["POST"])
+# def analyze():
+#     if model is None:
+#         return jsonify({"error": "Model is not loaded."}), 500
         
-    if "file" not in request.files:
-        return jsonify({"error": "No file uploaded."}), 400
+#     if "file" not in request.files:
+#         return jsonify({"error": "No file uploaded."}), 400
 
-    file = request.files["file"]
-    filename = file.filename
+#     file = request.files["file"]
+#     filename = file.filename
 
-    # 1. Extract features from the file object
-    features = extract_features(file)
-    if features is None:
-        return jsonify({"error": "Could not process audio file."}), 400
+#     # 1. Extract features from the file object
+#     features = extract_features(file)
+#     if features is None:
+#         return jsonify({"error": "Could not process audio file."}), 400
 
-    # 2. Get prediction (valence, arousal) from the model
-    features_reshaped = features.reshape(1, -1)
-    valence_arousal = model.predict(features_reshaped)
-    valence = valence_arousal[0][0]
-    arousal = valence_arousal[0][1]
+#     # 2. Get prediction (valence, arousal) from the model
+#     features_reshaped = features.reshape(1, -1)
+#     valence_arousal = model.predict(features_reshaped)
+#     valence = valence_arousal[0][0]
+#     arousal = valence_arousal[0][1]
 
-    # 3. Map the prediction to a single emotion word
-    emotion = map_emotion(valence, arousal)
+#     # 3. Map the prediction to a single emotion word
+#     emotion = map_emotion(valence, arousal)
     
-    # 4. Save the result to the database
-    new_song_analysis = AnalyzedSong(song_name=filename, predicted_emotion=emotion)
-    db.session.add(new_song_analysis)
-    db.session.commit()
+#     # 4. Save the result to the database
+#     new_song_analysis = AnalyzedSong(song_name=filename, predicted_emotion=emotion)
+#     db.session.add(new_song_analysis)
+#     db.session.commit()
     
-    return jsonify({
-        "song_name": filename,
-        "predicted_emotion": emotion,
-        "valence": float(valence),
-        "arousal": float(arousal),
-        "database_id": new_song_analysis.id
-    })
+#     return jsonify({
+#         "song_name": filename,
+#         "predicted_emotion": emotion,
+#         "valence": float(valence),
+#         "arousal": float(arousal),
+#         "database_id": new_song_analysis.id
+#     })
 
 
 @app.route("/recommend", methods=["POST"])
