@@ -111,7 +111,7 @@ const HomePage = ({ onGetStarted }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     return (
         <motion.div initial="initial" animate="in" exit="out" variants={animations} transition={pageTransition}>
-            <div className="min-h-screen bg-cover bg-bottom flex flex-col font-sans relative overflow-hidden" style={{ backgroundImage:`url(${pageBackground})` }}>
+            <div className="min-h-screen bg-cover bg-bottom flex flex-col font-sans relative overflow-hidden" style={{ backgroundImage: `url(${pageBackground}))` }}>
                 <header className="absolute top-0 left-0 right-0 p-6 md:p-8 z-20">
                   <nav className="container mx-auto flex justify-between items-center">
                     <div className="flex items-center gap-3"><div className="bg-[#FFC5C2] p-2 rounded-lg"><MusicIcon className="text-gray-900" /></div><span className="text-2xl font-bold tracking-wide text-gray-900">KaiROS</span></div>
@@ -220,7 +220,7 @@ const ProcessingPage = ({ error, onStartOver }) => (
     </motion.div>
 );
 
-// Results Page - UPDATED
+// Results Page
 const ResultsPage = ({ result, onStartOver }) => {
     // Defensive check for result data
     if (!result || !result.emotion || !result.recommendations) {
@@ -257,10 +257,16 @@ const ResultsPage = ({ result, onStartOver }) => {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {result.recommendations.map((song, index) => (
                                             <div key={index} className="bg-white/10 p-4 rounded-lg flex items-center gap-3 hover:bg-white/20 transition-colors">
-                                                <span className="text-xl font-bold text-white/50">{index + 1}.</span>
-                                                <div className="flex flex-col text-left">
-                                                    <span className="text-lg truncate font-semibold">{song.song_name}</span>
-                                                    <span className="text-sm text-white/70">{song.predicted_emotion}</span>
+                                                <span className="text-xl font-bold text-white/50 flex-shrink-0">{index + 1}.</span>
+                                                {/* This wrapper is key. 'min-w-0' allows the flex item to shrink and enables truncation. */}
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex flex-col text-left">
+                                                        {/* 'truncate' will now work as expected. Added title for full name on hover. */}
+                                                        <span className="text-lg truncate font-semibold" title={song.song_name}>
+                                                            {song.song_name}
+                                                        </span>
+                                                        <span className="text-sm text-white/70">{song.predicted_emotion}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         ))}
@@ -277,7 +283,7 @@ const ResultsPage = ({ result, onStartOver }) => {
 };
 
 
-// Main App Logic - UPDATED
+// Main App Logic 
 function App() {
     const [page, setPage] = useState('home');
     const [analysisResult, setAnalysisResult] = useState(null);
@@ -321,48 +327,45 @@ function App() {
         setPage('landing');
     };
 
-    // Data fetching - UPDATED
-    // In App.js, replace your existing handleUpload function with this one
-
-const handleUpload = async (file) => {
-    transnLandgtoProcesng();
-    setPage('processing');
-    setError(null);
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-        // --- Make only ONE API call to the correct /recommend endpoint ---
-        const response = await fetch('http://127.0.0.1:5000/recommend', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) {
-            // Get more detailed error from backend if available
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Could not get recommendations.');
-        }
-
-        const data = await response.json();
-
-        // --- Build the result object from the single, correct response ---
-        const combinedResult = {
-            emotion: data.seed_song_analysis.emotion,
-            recommendations: data.recommendations
-        };
-
-        transnProcesngtoResults();
-        setAnalysisResult(combinedResult);
-        setPage('results');
-
-    } catch (err) {
-        console.error("API call failed:", err);
-        setError(err.message || 'Failed to fetch. Please check your connection.');
+    const handleUpload = async (file) => {
+        transnLandgtoProcesng();
         setPage('processing');
-    }
-};
+        setError(null);
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('http://127.0.0.1:5000/recommend', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: 'An unknown error occurred.' }));
+                throw new Error(errorData.error || 'Could not get recommendations.');
+            }
+
+            const data = await response.json();
+
+            const combinedResult = {
+                emotion: data.seed_song_analysis.emotion,
+                recommendations: data.recommendations
+            };
+            
+            
+            setTimeout(() => {
+                transnProcesngtoResults();
+                setAnalysisResult(combinedResult);
+                setPage('results');
+            }, 2500);
+
+        } catch (err) {
+            console.error("API call failed:", err);
+            setError(err.message || 'Failed to fetch. Please check your connection.');
+            setPage('processing');
+        }
+    };
 
     const renderPage = () => {
         switch (page) {
@@ -375,17 +378,17 @@ const handleUpload = async (file) => {
     };
 
     return (
-    <>
-        {/* --- FIX: Removed the unnecessary curly braces --- */}
-        <audio ref={HometoLang} src={softSound} preload="auto" />
-        <audio ref={LandgtoProcesng} src={uploadSound} preload="auto" />
-        <audio ref={ProcesngtoResults} src={resultsSound} preload="auto" />
-        
-        <AnimatePresence mode="wait">
-            {renderPage()}
-        </AnimatePresence>
-    </>
-);
+        <>
+            
+                <audio ref={HometoLang} src={softSound} preload="auto" />
+                <audio ref={LandgtoProcesng} src={uploadSound} preload="auto" />
+                <audio ref={ProcesngtoResults} src={resultsSound} preload="auto" />
+            
+            <AnimatePresence mode="wait">
+                {renderPage()}
+            </AnimatePresence>
+        </>
+    );
 }
 
 export default App;
