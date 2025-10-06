@@ -111,7 +111,7 @@ const HomePage = ({ onGetStarted }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     return (
         <motion.div initial="initial" animate="in" exit="out" variants={animations} transition={pageTransition}>
-            <div className="min-h-screen bg-cover bg-bottom flex flex-col font-sans relative overflow-hidden" style={{ backgroundImage: `url(${pageBackground}))` }}>
+            <div className="min-h-screen bg-cover bg-bottom flex flex-col font-sans relative overflow-hidden" style={{ backgroundImage: `url(${pageBackground})` }}>
                 <header className="absolute top-0 left-0 right-0 p-6 md:p-8 z-20">
                   <nav className="container mx-auto flex justify-between items-center">
                     <div className="flex items-center gap-3"><div className="bg-[#FFC5C2] p-2 rounded-lg"><MusicIcon className="text-gray-900" /></div><span className="text-2xl font-bold tracking-wide text-gray-900">KaiROS</span></div>
