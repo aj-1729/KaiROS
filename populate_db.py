@@ -3,17 +3,25 @@ from app import app, db, AnalyzedSong, extract_features, map_emotion, model
 
 SONG_LIBRARY_PATH = 'song_library'
 
-def analyze_and_populate():
+def update_library():
+    """
+    Safely adds new songs from the library to the database
+    without deleting existing entries.
+    """
     with app.app_context():
-        db.session.query(AnalyzedSong).delete()
-        db.session.commit()
-        print("Cleared old database entries.")
+        existing_songs = [song.song_name for song in AnalyzedSong.query.all()]
+        print(f"Found {len(existing_songs)} songs already in the database.")
 
         for filename in os.listdir(SONG_LIBRARY_PATH):
             if filename.endswith('.mp3'):
-                file_path = os.path.join(SONG_LIBRARY_PATH, filename)
-                print(f"Analyzing {filename}...")
+                if filename in existing_songs:
+                    print(f"Skipping {filename}, already in database.")
+                    continue
 
+                file_path = os.path.join(SONG_LIBRARY_PATH, filename)
+                print(f"Analyzing new song: {filename}...")
+
+                # ... (feature extraction and prediction logic remains the same) ...
                 features = extract_features(file_path)
                 if features is None:
                     continue
@@ -31,10 +39,16 @@ def analyze_and_populate():
                 db.session.add(new_song)
 
         db.session.commit()
-        print("Database populated successfully!")
+        print("Database update complete!")
 
 if __name__ == '__main__':
     if model is None:
         print("Error: Model not loaded. Cannot run analysis.")
     else:
-        analyze_and_populate()
+        # --- ADDED: Ensure tables are created before running ---
+        with app.app_context():
+            db.create_all()
+            print("Database tables checked/created.")
+        
+        # Now call the function to add new songs
+        update_library()
