@@ -2,7 +2,7 @@
 
 :: --- 1. SET UP ENVIRONMENT ---
 :: Change directory to the root of your project
-cd /d "C:\Users\BIT\Desktop\KaiROS"
+cd /d "C:\Users\aksha\Desktop\KaiROS"
 
 :: Activate the virtual environment in the current window's context
 call .venv\Scripts\activate.bat
