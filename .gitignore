@@ -3,4 +3,3 @@ venv/
 __pycache__/
 database.db
 .kairos
-song_library/
