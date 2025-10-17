@@ -6,22 +6,22 @@ import uploadSound from './cinematic-designed-sci-fi-whoosh-transition-nexawave-
 import resultsSound from './lucky-guitar-sound-379745.mp3';
 
 const animations = {
-  initial: {
-    opacity: 0
-  },
-  in: {
-    opacity: 1
-  },
-  out: {
-    opacity: 0
-  }
+    initial: {
+        opacity: 0
+    },
+    in: {
+        opacity: 1
+    },
+    out: {
+        opacity: 0
+    }
 };
 
 
 const pageTransition = {
-  type: "tween",
-  ease: "easeInOut",
-  duration: 1.0
+    type: "tween",
+    ease: "easeInOut",
+    duration: 1.0
 };
 
 
@@ -33,9 +33,9 @@ const MusicIcon = ({ className }) => (
 );
 
 
-const Header = () => (
+const Header = ({ onGoHome }) => (
     <header className="flex justify-between items-center w-full">
-        <a href="#" className="flex items-center gap-3 z-10">
+        <a href="#" onClick={(e) => { e.preventDefault(); onGoHome && onGoHome(); }} className="flex items-center gap-3 z-10 cursor-pointer">
             <div className="bg-black/20 p-2 rounded-lg">
                 <MusicIcon className="text-white" />
             </div>
@@ -56,7 +56,7 @@ const Header = () => (
 );
 
 
-const Footer = ({ bgColor, dropdownColor }) => (
+const Footer = ({ bgColor, dropdownColor, onContactClick }) => (
      <footer className="w-full" style={{ backgroundColor: bgColor }}>
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-10">
             {/* Mobile Layout*/}
@@ -71,7 +71,8 @@ const Footer = ({ bgColor, dropdownColor }) => (
                 </div>
                 <nav className="flex flex-wrap justify-center items-center gap-6 font-medium text-gray-600">
                     <a href="#" className="hover:text-black transition-colors">Cookies</a>
-                    <a href="#" className="hover:text-black transition-colors">Contacts</a>
+                    {/* --- MODIFIED LINK --- */}
+                    <a href="#" onClick={(e) => { e.preventDefault(); onContactClick(); }} className="hover:text-black transition-colors">Contact Us</a>
                     <a href="#" className="hover:text-black transition-colors">About us</a>
                 </nav>
             </div>
@@ -93,7 +94,8 @@ const Footer = ({ bgColor, dropdownColor }) => (
                 <div className="justify-self-end">
                     <nav className="flex items-center gap-6 font-medium text-gray-600">
                         <a href="#" className="hover:text-black transition-colors">Cookies</a>
-                        <a href="#" className="hover:text-black transition-colors">Contacts</a>
+                        {/* --- MODIFIED LINK --- */}
+                        <a href="#" onClick={(e) => { e.preventDefault(); onContactClick(); }} className="hover:text-black transition-colors">Contact Us</a>
                         <a href="#" className="hover:text-black transition-colors">About us</a>
                     </nav>
                 </div>
@@ -107,18 +109,21 @@ const Footer = ({ bgColor, dropdownColor }) => (
 );
 
 // Home Page
-const HomePage = ({ onGetStarted }) => {
+const HomePage = ({ onGetStarted, onGoHome, onContactClick }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     return (
         <motion.div initial="initial" animate="in" exit="out" variants={animations} transition={pageTransition}>
             <div className="min-h-screen bg-cover bg-bottom flex flex-col font-sans relative overflow-hidden" style={{ backgroundImage: `url(${pageBackground})` }}>
                 <header className="absolute top-0 left-0 right-0 p-6 md:p-8 z-20">
-                  <nav className="container mx-auto flex justify-between items-center">
-                    <div className="flex items-center gap-3"><div className="bg-[#FFC5C2] p-2 rounded-lg"><MusicIcon className="text-gray-900" /></div><span className="text-2xl font-bold tracking-wide text-gray-900">KaiROS</span></div>
-                    <div className="hidden md:block absolute left-1/2 -translate-x-1/2 px-4 py-2 rounded-full font-medium text-gray-800" style={{backgroundColor: '#FFC5C2'}}>Connect. Emotions. Cherish. Moments.</div>
-                    <div className="hidden md:flex items-center space-x-4"><button className="font-semibold text-gray-800 px-5 py-2 rounded-md hover:bg-black/5 transition-colors">Log in</button><button className="font-semibold px-5 py-2 rounded-md bg-[#626161] text-white hover:bg-gray-700 transition-all">Sign up</button></div>
-                    <div className="md:hidden"><button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-900">{isMenuOpen ? <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg> : <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>}</button></div>
-                  </nav>
+                    <nav className="container mx-auto flex justify-between items-center">
+                        <a href="#" onClick={(e) => { e.preventDefault(); onGoHome && onGoHome(); }} className="flex items-center gap-3 cursor-pointer">
+                            <div className="bg-[#FFC5C2] p-2 rounded-lg"><MusicIcon className="text-gray-900" /></div>
+                            <span className="text-2xl font-bold tracking-wide text-gray-900">KaiROS</span>
+                        </a>
+                        <div className="hidden md:block absolute left-1/2 -translate-x-1/2 px-4 py-2 rounded-full font-medium text-gray-800" style={{backgroundColor: '#FFC5C2'}}>Connect. Emotions. Cherish. Moments.</div>
+                        <div className="hidden md:flex items-center space-x-4"><button className="font-semibold text-gray-800 px-5 py-2 rounded-md hover:bg-black/5 transition-colors">Log in</button><button className="font-semibold px-5 py-2 rounded-md bg-[#626161] text-white hover:bg-gray-700 transition-all">Sign up</button></div>
+                        <div className="md:hidden"><button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-900">{isMenuOpen ? <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg> : <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>}</button></div>
+                    </nav>
                 </header>
                 <div className={`md:hidden absolute top-0 left-0 w-full h-full bg-white/90 backdrop-blur-sm z-10 flex flex-col items-center justify-center gap-8 transition-transform duration-300 ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}><a href="#" className="text-2xl font-semibold text-gray-800">Home</a><a href="#" className="text-2xl font-semibold text-gray-800">About</a><a href="#" className="text-2xl font-semibold text-gray-800">Contact</a><div className="mt-8 flex flex-col gap-4 w-4/5"><button className="font-semibold w-full text-gray-800 px-5 py-3 rounded-md border border-gray-400">Log in</button><button className="font-semibold w-full px-5 py-3 rounded-md bg-[#626161] text-white">Sign up</button></div></div>
                 <main className="flex-grow flex flex-col justify-center items-center md:items-start text-center md:text-left px-6 md:pl-20 relative z-0">
@@ -139,7 +144,8 @@ const HomePage = ({ onGetStarted }) => {
                 </div>
                 <div className="hidden md:flex absolute bottom-8 right-8 space-x-6 text-gray-900 font-semibold">
                     <a href="#" className="hover:underline transition-colors">ABOUT US</a>
-                    <a href="#" className="hover:underline transition-colors">CONTACT</a>
+                    {/* --- MODIFIED LINK --- */}
+                    <a href="#" onClick={(e) => { e.preventDefault(); onContactClick(); }} className="hover:underline transition-colors">CONTACT US</a>
                 </div>
             </div>
         </motion.div>
@@ -147,7 +153,7 @@ const HomePage = ({ onGetStarted }) => {
 };
 
 // Landing Page
-const LandingPage = ({ onUpload }) => {
+const LandingPage = ({ onUpload, onGoHome, onContactClick }) => {
     const fileInputRef = useRef(null);
     const [fileName, setFileName] = useState('');
 
@@ -167,7 +173,7 @@ const LandingPage = ({ onUpload }) => {
                 <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" accept="audio/*" />
                 <div className="text-white rounded-b-[3rem] md:rounded-b-[5rem] drop-shadow-2xl flex-grow" style={{ backgroundColor: '#8B7DD8' }}>
                     <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-6 h-full flex flex-col">
-                        <Header />
+                        <Header onGoHome={onGoHome} />
                         <main className="flex-grow flex flex-col items-center justify-center text-center py-20 sm:py-24 lg:py-32">
                             <div className="max-w-4xl w-full">
                                 <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight" style={{ color: '#FDE047' }}>Listen to the Feeling, Not Just the Sound</h1>
@@ -177,19 +183,20 @@ const LandingPage = ({ onUpload }) => {
                         </main>
                     </div>
                 </div>
-                <Footer bgColor="#F2EBAF" dropdownColor="#8A898F"/>
+                {/* --- MODIFIED FOOTER --- */}
+                <Footer bgColor="#F2EBAF" dropdownColor="#8A898F" onContactClick={onContactClick} />
             </div>
         </motion.div>
     );
 };
 
 // Processing Page
-const ProcessingPage = ({ error, onStartOver }) => (
+const ProcessingPage = ({ error, onStartOver, onGoHome, onContactClick }) => (
     <motion.div initial="initial" animate="in" exit="out" variants={animations} transition={pageTransition}>
         <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#D7E5A2' }}>
             <div className="text-white rounded-b-[3rem] md:rounded-b-[5rem] drop-shadow-2xl flex-grow flex flex-col" style={{ backgroundColor: '#7CAA73' }}>
                 <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-6 w-full">
-                    <Header />
+                    <Header onGoHome={onGoHome} />
                 </div>
                 <main className="flex-grow flex items-center justify-center text-center p-4">
                     {error ? (
@@ -215,14 +222,14 @@ const ProcessingPage = ({ error, onStartOver }) => (
                     )}
                 </main>
             </div>
-           <Footer bgColor="#D7E5A2" dropdownColor="#787B7A"/>
+           {/* --- MODIFIED FOOTER --- */}
+           <Footer bgColor="#D7E5A2" dropdownColor="#787B7A" onContactClick={onContactClick} />
         </div>
     </motion.div>
 );
 
 // Results Page
-const ResultsPage = ({ result, onStartOver }) => {
-    // Defensive check for result data
+const ResultsPage = ({ result, onStartOver, onGoHome, onContactClick }) => {
     if (!result || !result.emotion || !result.recommendations) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-800 text-white">
@@ -236,7 +243,7 @@ const ResultsPage = ({ result, onStartOver }) => {
             <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#E5CBA2' }}>
                 <div className="text-white rounded-b-[3rem] md:rounded-b-[5rem] drop-shadow-2xl flex-grow" style={{ backgroundColor: '#477B80' }}>
                     <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-6 h-full flex flex-col">
-                        <Header />
+                        <Header onGoHome={onGoHome} />
                         <main className="flex-grow flex flex-col lg:flex-row items-center justify-center text-center lg:text-left p-4 gap-12 py-20 sm:py-24 lg:py-32">
                             <div className="w-full lg:w-2/5 flex flex-col items-center lg:items-start space-y-8">
                                 <h1 className="text-4xl md:text-5xl font-bold leading-tight">
@@ -257,16 +264,10 @@ const ResultsPage = ({ result, onStartOver }) => {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         {result.recommendations.map((song, index) => (
                                             <div key={index} className="bg-white/10 p-4 rounded-lg flex items-center gap-3 hover:bg-white/20 transition-colors">
-                                                <span className="text-xl font-bold text-white/50 flex-shrink-0">{index + 1}.</span>
-                                                {/* This wrapper is key. 'min-w-0' allows the flex item to shrink and enables truncation. */}
-                                                <div className="min-w-0 flex-1">
-                                                    <div className="flex flex-col text-left">
-                                                        {/* 'truncate' will now work as expected. Added title for full name on hover. */}
-                                                        <span className="text-lg truncate font-semibold" title={song.song_name}>
-                                                            {song.song_name}
-                                                        </span>
-                                                        <span className="text-sm text-white/70">{song.predicted_emotion}</span>
-                                                    </div>
+                                                <span className="text-xl font-bold text-white/50">{index + 1}.</span>
+                                                <div className="flex flex-col text-left min-w-0"> {/* Added min-w-0 for truncation */}
+                                                    <span className="text-lg truncate font-semibold" title={song.song_name}>{song.song_name}</span>
+                                                    <span className="text-sm text-white/70">{song.predicted_emotion}</span>
                                                 </div>
                                             </div>
                                         ))}
@@ -276,107 +277,197 @@ const ResultsPage = ({ result, onStartOver }) => {
                         </main>
                     </div>
                 </div>
-               <Footer bgColor="#E5CBA2" dropdownColor="#787B7A"/>
+               {/* --- MODIFIED FOOTER --- */}
+               <Footer bgColor="#E5CBA2" dropdownColor="#787B7A" onContactClick={onContactClick} />
             </div>
         </motion.div>
     );
 };
 
 
-// Main App Logic - CORRECTED
+// --- NEW COMPONENT: ContactModal ---
+
+const modalBackdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1 },
+};
+
+const modalContentVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.9 },
+    visible: { opacity: 1, y: 0, scale: 1 },
+};
+
+const ContactModal = ({ isOpen, onClose }) => {
+    return (
+        <AnimatePresence>
+            {isOpen && (
+                <motion.div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4"
+                    initial="hidden"
+                    animate="visible"
+                    exit="hidden"
+                >
+                    {/* Backdrop */}
+                    <motion.div
+                        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+                        variants={modalBackdropVariants}
+                        onClick={onClose}
+                    ></motion.div>
+
+                    {/* Modal Content */}
+                    <motion.div
+                        className="relative z-10 w-full max-w-md p-6 bg-white rounded-2xl shadow-xl text-gray-800"
+                        variants={modalContentVariants}
+                        transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                    >
+                        <div className="flex justify-between items-center mb-4">
+                            <h2 className="text-2xl font-bold text-gray-900">Contact Us</h2>
+                            <button
+                                onClick={onClose}
+                                className="text-gray-400 hover:text-gray-700 transition-colors"
+                                aria-label="Close modal"
+                            >
+                                {/* Close Icon */}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <p className="text-lg">For any inquiries, please email us at:</p>
+                        <p className="mt-2 text-xl font-semibold text-center bg-gray-100 p-3 rounded-lg text-blue-600 break-words">
+                            KaiROSnoFuture@gmail.com
+                        </p>
+                    </motion.div>
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
+};
+
+
+// Main App Logic
 function App() {
     const [page, setPage] = useState('home');
     const [analysisResult, setAnalysisResult] = useState(null);
     const [error, setError] = useState(null);
+    const [showContactModal, setShowContactModal] = useState(false); // <-- ADDED STATE
 
-    const HometoLang = useRef(null);
-    const LandgtoProcesng = useRef(null);
-    const ProcesngtoResults = useRef(null);
+    const HometoLang = useRef({ play: () => {}, currentTime: 0 });
+    const LandgtoProcesng = useRef({ play: () => {}, currentTime: 0 });
+    const ProcesngtoResults = useRef({ play: () => {}, currentTime: 0 });
 
-    // --- FIX 1: Make sound functions async ---
-    const playSound = async (audioRef) => {
-        if (audioRef.current) {
-            try {
-                audioRef.current.currentTime = 0;
-                await audioRef.current.play(); // Wait for play to finish
-            } catch (err) {
-                console.error("Audio play was interrupted or failed:", err);
-            }
+    const transnHometoLandg = () => {
+        if (HometoLang.current) {
+            HometoLang.current.currentTime = 0;
+            HometoLang.current.play();
         }
     };
 
-    // --- FIX 2: Make handler functions async ---
-    const handleGetStarted = async () => {
-        await playSound(HometoLang);
+    const transnLandgtoProcesng = () => {
+        if (LandgtoProcesng.current) {
+            LandgtoProcesng.current.currentTime = 0;
+            LandgtoProcesng.current.play();
+        }
+    };
+
+    const transnProcesngtoResults = () => {
+        if (ProcesngtoResults.current) {
+            ProcesngtoResults.current.currentTime = 0;
+            ProcesngtoResults.current.play();
+        }
+    };
+
+    const handleGetStarted = () => {
+        transnHometoLandg();
         setPage('landing');
     };
 
-    const handleStartOver = async () => {
-        await playSound(HometoLang);
+    const handleStartOver = () => {
+        transnHometoLandg();
         setAnalysisResult(null);
         setError(null);
         setPage('landing');
     };
 
-    // In App.js
+    const handleGoHome = () => {
+        setPage('home');
+    };
+    
+    // --- ADDED HANDLERS ---
+    const openContactModal = () => setShowContactModal(true);
+    const closeContactModal = () => setShowContactModal(false);
+    // ---------------------
 
-const handleUpload = async (file) => {
-    await playSound(LandgtoProcesng); // Play sound and wait
-    setPage('processing');
-    setError(null);
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    try {
-        const response = await fetch('http://127.0.0.1:5000/recommend', {
-            method: 'POST',
-            body: formData
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || 'Could not get recommendations.');
-        }
-
-        const data = await response.json();
-        const combinedResult = {
-            emotion: data.seed_song_analysis.emotion,
-            recommendations: data.recommendations
-        };
-        
-        // --- NEW: Add a minimum delay to show the animation ---
-        const minDisplayTime = 2000; // 2000 milliseconds = 2 seconds
-        await new Promise(resolve => setTimeout(resolve, minDisplayTime));
-
-        // Wait for the results sound before showing the page
-        await playSound(ProcesngtoResults); 
-        setAnalysisResult(combinedResult);
-        setPage('results');
-
-    } catch (err) {
-        console.error("API call failed:", err);
-        setError(err.message || 'Failed to fetch. Please check your connection.');
+    // --- THIS IS THE CORRECTED FUNCTION ---
+    const handleUpload = async (file) => {
+        transnLandgtoProcesng();
         setPage('processing');
-    }
-};
+        setError(null);
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            // 1. Call ONLY the /recommend endpoint (like in your old code)
+            const response = await fetch('http://127.0.0.1:5000/recommend', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                // Get error details from backend if possible
+                const errorData = await response.json().catch(() => ({ error: 'An unknown error occurred.' }));
+                throw new Error(errorData.error || 'Could not get recommendations.');
+            }
+
+            const data = await response.json();
+
+            // 2. Use the data structure from your old code
+            const combinedResult = {
+                emotion: data.seed_song_analysis.emotion,
+                recommendations: data.recommendations
+            };
+            
+            // 3. Play sound and set page
+            transnProcesngtoResults();
+            setAnalysisResult(combinedResult);
+            setPage('results');
+
+        } catch (err) {
+            console.error("API call failed:", err);
+            setError(err.message || 'Failed to fetch. Please check your connection.');
+            setPage('processing'); // Stay on processing page to show the error
+        }
+    };
+    // ------------------------------------
 
     const renderPage = () => {
         switch (page) {
-            case 'landing': return <LandingPage key="landing" onUpload={handleUpload} />;
-            case 'processing': return <ProcessingPage key="processing" error={error} onStartOver={handleStartOver} />;
-            case 'results': return <ResultsPage key="results" result={analysisResult} onStartOver={handleStartOver} />;
+            case 'landing':
+                // --- PROP ADDED ---
+                return <LandingPage key="landing" onUpload={handleUpload} onGoHome={handleGoHome} onContactClick={openContactModal} />;
+            case 'processing':
+                // --- PROP ADDED ---
+                return <ProcessingPage key="processing" error={error} onStartOver={handleStartOver} onGoHome={handleGoHome} onContactClick={openContactModal} />;
+            case 'results':
+                // --- PROP ADDED ---
+                return <ResultsPage key="results" result={analysisResult} onStartOver={handleStartOver} onGoHome={handleGoHome} onContactClick={openContactModal} />;
             case 'home':
-            default: return <HomePage key="home" onGetStarted={handleGetStarted} />;
+            default:
+                // --- PROP ADDED ---
+                return <HomePage key="home" onGetStarted={handleGetStarted} onGoHome={handleGoHome} onContactClick={openContactModal} />;
         }
     };
 
     return (
         <>
-            {/* Note: I've also updated your audio refs to be correct */}
             <audio ref={HometoLang} src={softSound} preload="auto" />
             <audio ref={LandgtoProcesng} src={uploadSound} preload="auto" />
             <audio ref={ProcesngtoResults} src={resultsSound} preload="auto" />
+            
+            {/* --- ADDED MODAL RENDER --- */}
+            <ContactModal isOpen={showContactModal} onClose={closeContactModal} />
             
             <AnimatePresence mode="wait">
                 {renderPage()}
