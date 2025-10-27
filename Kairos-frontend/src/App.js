@@ -102,7 +102,7 @@ const Footer = ({ bgColor, dropdownColor, onContactClick }) => (
             </div>
 
             <div className="mt-12 pt-8 border-t border-gray-400/50 text-center">
-                <p className="text-gray-500">KaiROS, 2025, All rights reserved (no we don't)</p>
+                <p className="text-gray-500">KaiROS, 2025, All rights reserved</p>
             </div>
         </div>
     </footer>
@@ -336,7 +336,7 @@ const ContactModal = ({ isOpen, onClose }) => {
                         </div>
                         <p className="text-lg">For any inquiries, please email us at:</p>
                         <p className="mt-2 text-xl font-semibold text-center bg-gray-100 p-3 rounded-lg text-blue-600 break-words">
-                            KaiROSnoFuture@gmail.com
+                            nofuture@zohomail.in
                         </p>
                     </motion.div>
                 </motion.div>
@@ -410,7 +410,7 @@ function App() {
 
         try {
             // 1. Call ONLY the /recommend endpoint (like in your old code)
-            const response = await fetch('http://127.0.0.1:5000/recommend', {
+            const response = await fetch('https://kairosnofuture-kairos.hf.space/recommend', {
                 method: 'POST',
                 body: formData
             });
