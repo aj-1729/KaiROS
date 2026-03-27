@@ -1,5 +1,26 @@
-.venv/
-venv/
+# Python cache files
 __pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+
+# Local Databases (Crucial: Don't push your local testing data)
 database.db
-song_library/
+*.sqlite
+*.db
+
+# OS Generated Files & Weird Artifacts
+*Zone.Identifier
+.DS_Store
+Thumbs.db
+
+# Frontend Dependencies (Assuming Kairos-frontend is a Node project)
+Kairos-frontend/node_modules/
+Kairos-frontend/build/
+Kairos-frontend/dist/
+Kairos-frontend/.env
+
+# Environment Variables
+.env
